@@ -7,6 +7,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <>
             <Head>
                 <title>Step - A MYPD Project</title>
+                <link rel="icon" href="/favicon.ico" />
             </Head>
 
             <Component {...pageProps} />
