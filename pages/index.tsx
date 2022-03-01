@@ -15,11 +15,11 @@ export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
     const [clicked, setClicked] = React.useState<boolean>(false);
 
     // Subscribe this component to the render-loop, rotate the mesh every frame
-    useFrame((state, delta) => (meshRef.current.rotation.x += 0.01));
+    // useFrame((state, delta) => (meshRef.current.rotation.x += 0.01));
 
-    let scale = 2;
-    if (hovered) scale = 2.5;
-    if (clicked) scale = 3;
+    const scale = 3;
+    // if (hovered) scale = 2.5;
+    // if (clicked) scale = 3;
 
     return (
         <React.Fragment>
