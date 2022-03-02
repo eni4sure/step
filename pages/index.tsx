@@ -5,13 +5,6 @@ import { OrbitControls, Stars, Edges, useTexture } from "@react-three/drei";
 
 import type { NextPage } from "next";
 
-const BoxGeo = () => {
-    var geometry = new THREE.BoxGeometry(1, 1, 1);
-    console.log(geometry);
-
-    return geometry;
-};
-
 export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
     // This reference gives us direct access to the THREE.Mesh object
     const meshRef = React.useRef<THREE.Mesh>(null!);
@@ -23,7 +16,7 @@ export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
     const [clicked, setClicked] = React.useState<boolean>(false);
 
     // Subscribe this component to the render-loop, rotate the mesh every frame
-    useFrame((state, delta) => (meshRef.current.rotation.x = meshRef.current.rotation.y += 0.01));
+    // useFrame((state, delta) => (meshRef.current.rotation.x = meshRef.current.rotation.y += 0.01));
 
     // Highlight face when mesh is clicked
     const handleClick = (event: ThreeEvent<MouseEvent>) => {
