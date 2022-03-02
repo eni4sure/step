@@ -1,8 +1,7 @@
 import React from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Stars } from "@react-three/drei";
-import { EffectComposer, Outline } from "@react-three/postprocessing";
+import { OrbitControls, Stars, Edges } from "@react-three/drei";
 
 import type { NextPage } from "next";
 
@@ -17,9 +16,7 @@ export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
     // Subscribe this component to the render-loop, rotate the mesh every frame
     // useFrame((state, delta) => (meshRef.current.rotation.x += 0.01));
 
-    const scale = 3;
-    // if (hovered) scale = 2.5;
-    // if (clicked) scale = 3;
+    const scale = 2;
 
     return (
         <React.Fragment>
@@ -33,11 +30,10 @@ export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
             >
                 <icosahedronGeometry attach="geometry" />
                 <meshStandardMaterial attach="material" color={hovered ? "blue" : "white"} />
+                <Edges visible={true} scale={1} renderOrder={200}>
+                    <meshBasicMaterial color="#000" depthTest={true} />
+                </Edges>
             </mesh>
-
-            <EffectComposer autoClear={false}>
-                <Outline blur={true} selection={meshRef} visibleEdgeColor={0x000000} edgeStrength={5} />
-            </EffectComposer>
         </React.Fragment>
     );
 };
@@ -48,7 +44,7 @@ const Home: NextPage = () => {
             <Canvas dpr={[1, 2]}>
                 <Stars />
                 <OrbitControls />
-                <ambientLight intensity={0.5} />
+                <ambientLight intensity={2} />
                 <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
                 <pointLight position={[-10, -10, -10]} />
 
