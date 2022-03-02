@@ -1,22 +1,38 @@
 import React from "react";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Stars, Edges } from "@react-three/drei";
+import { Canvas, useLoader, useFrame, ThreeEvent } from "@react-three/fiber";
+import { OrbitControls, Stars, Edges, useTexture } from "@react-three/drei";
 
 import type { NextPage } from "next";
+
+const BoxGeo = () => {
+    var geometry = new THREE.BoxGeometry(1, 1, 1);
+    console.log(geometry);
+
+    return geometry;
+};
 
 export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
     // This reference gives us direct access to the THREE.Mesh object
     const meshRef = React.useRef<THREE.Mesh>(null!);
+    const geometryRef = React.useRef<THREE.IcosahedronGeometry>(null!);
 
     // Hold state for hover and clicked events
+    const [scale] = React.useState<number>(2);
     const [hovered, setHover] = React.useState<boolean>(false);
     const [clicked, setClicked] = React.useState<boolean>(false);
 
     // Subscribe this component to the render-loop, rotate the mesh every frame
-    // useFrame((state, delta) => (meshRef.current.rotation.x += 0.01));
+    useFrame((state, delta) => (meshRef.current.rotation.x = meshRef.current.rotation.y += 0.01));
 
-    const scale = 2;
+    // Highlight face when mesh is clicked
+    const handleClick = (event: ThreeEvent<MouseEvent>) => {
+        // Get the face that was clicked
+        console.log("face", event.face);
+        console.log("faceIndex", event.faceIndex);
+
+        setClicked(!clicked);
+    };
 
     return (
         <React.Fragment>
@@ -24,12 +40,12 @@ export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
                 {...props}
                 ref={meshRef}
                 scale={scale}
-                onClick={(event) => setClicked(!clicked)}
+                onClick={(event) => handleClick(event)}
                 onPointerOver={(event) => setHover(true)}
                 onPointerOut={(event) => setHover(false)}
             >
-                <icosahedronGeometry attach="geometry" />
-                <meshStandardMaterial attach="material" color={hovered ? "blue" : "white"} />
+                <icosahedronGeometry ref={geometryRef} attach="geometry" />
+                <meshStandardMaterial attach="material" color={"white"} />
                 <Edges visible={true} scale={1} renderOrder={200}>
                     <meshBasicMaterial color="#000" depthTest={true} />
                 </Edges>
@@ -40,15 +56,17 @@ export const IcosahedronGeometryMeshComponent: React.FC = (props) => {
 
 const Home: NextPage = () => {
     return (
-        <main className="w-screen h-screen bg-gray-500">
-            <Canvas dpr={[1, 2]}>
+        <main className="w-screen h-screen bg-gray-400">
+            <Canvas>
                 <Stars />
                 <OrbitControls />
-                <ambientLight intensity={2} />
+                <ambientLight intensity={3} />
                 <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
                 <pointLight position={[-10, -10, -10]} />
 
-                <IcosahedronGeometryMeshComponent />
+                <React.Suspense fallback={null}>
+                    <IcosahedronGeometryMeshComponent />
+                </React.Suspense>
             </Canvas>
         </main>
     );
