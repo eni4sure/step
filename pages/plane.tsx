@@ -37,7 +37,6 @@ export const Surface = (props: SurfacePropType) => {
         <mesh
             {...props}
             ref={ref}
-            args={[2, 2]}
             onClick={(event) => handleClick(event)}
             onPointerOver={(event) => setHover(true)}
             onPointerOut={(event) => setHover(false)}
