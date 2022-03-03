@@ -12,11 +12,16 @@ type TrianglePropType = {
     rotateX?: number;
     rotateY?: number;
     rotateZ?: number;
+
+    trianglesBroken: number;
+    setTrianglesBroken?: (trianglesBroken: number) => void;
 };
 
 export const TriangleMeshComponent = (props: TrianglePropType) => {
     // This reference gives us direct access to the THREE.Mesh object
     const meshRef = React.useRef<THREE.Mesh>(null!);
+
+    const { rotateX, rotateY, rotateZ, trianglesBroken, setTrianglesBroken, ...remaining_prop } = props;
 
     // Hold state for hover and clicked events
     const [scale] = React.useState<number>(0.02);
@@ -33,11 +38,13 @@ export const TriangleMeshComponent = (props: TrianglePropType) => {
         // meshRef.current.rotation.y += 0.01;
     });
 
-    // Highlight face when mesh is clicked
+    // When mesh is clicked
     const handleClick = (event: ThreeEvent<MouseEvent>) => {
-        // Get the face that was clicked
-        console.log("face", event.face);
-        console.log("faceIndex", event.faceIndex);
+        if (props.setTrianglesBroken) {
+            // Increment the broken counter
+            props.setTrianglesBroken(props.trianglesBroken + 1);
+            return;
+        }
 
         setClicked(!clicked);
     };
@@ -45,12 +52,12 @@ export const TriangleMeshComponent = (props: TrianglePropType) => {
     return (
         <React.Fragment>
             <mesh
-                {...props}
                 ref={meshRef}
                 scale={scale}
                 onClick={(event) => handleClick(event)}
                 onPointerOver={(event) => setHover(true)}
                 onPointerOut={(event) => setHover(false)}
+                {...remaining_prop}
             >
                 <cylinderGeometry args={[0, 75, 100, 2]} />
                 <meshStandardMaterial color={hovered ? "yellow" : "white"} />
@@ -63,6 +70,9 @@ export const TriangleMeshComponent = (props: TrianglePropType) => {
 };
 
 const Home: NextPage = () => {
+    const [trianglesBroken, setTrianglesBroken] = React.useState<number>(0);
+
+    console.log(trianglesBroken);
     return (
         <main className="w-screen h-screen bg-gray-400">
             <Canvas>
@@ -72,37 +82,43 @@ const Home: NextPage = () => {
                 <spotLight position={new THREE.Vector3(10, 10, 10)} angle={0.15} penumbra={1} />
                 <pointLight position={new THREE.Vector3(-10, -10, -10)} />
 
-                <React.Suspense fallback={null}>
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 0)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 1.5)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 3)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 4.5)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 6)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 7.5)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 9)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 10.5)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 0, 12)} />
+                {trianglesBroken === 0 && (
+                    <TriangleMeshComponent
+                        position={new THREE.Vector3(0, 0, 3)}
+                        trianglesBroken={trianglesBroken}
+                        setTrianglesBroken={setTrianglesBroken}
+                    />
+                )}
 
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 2, 1.5)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 2, 3)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 2, 4.5)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 2, 6)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 2, 7.5)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 2, 9)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 2, 10.5)} />
-
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 4, 3)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 4, 4.5)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 4, 6)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 4, 7.5)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 4, 9)} />
-
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 6, 4.5)} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 6, 6)} rotateX={Math.PI} />
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 6, 7.5)} />
-
-                    <TriangleMeshComponent position={new THREE.Vector3(0, 8, 6)} />
-                </React.Suspense>
+                {trianglesBroken > 0 &&
+                    Array(trianglesBroken)
+                        .fill(1)
+                        .map((_, i) => {
+                            return (
+                                <React.Suspense fallback={null} key={i}>
+                                    <TriangleMeshComponent
+                                        setTrianglesBroken={setTrianglesBroken}
+                                        trianglesBroken={trianglesBroken}
+                                        position={new THREE.Vector3(0, i + i, 3)}
+                                    />
+                                    <TriangleMeshComponent
+                                        setTrianglesBroken={setTrianglesBroken}
+                                        trianglesBroken={trianglesBroken}
+                                        position={new THREE.Vector3(0, i + i, 6)}
+                                    />
+                                    <TriangleMeshComponent
+                                        setTrianglesBroken={setTrianglesBroken}
+                                        trianglesBroken={trianglesBroken}
+                                        position={new THREE.Vector3(0, i + i, 9)}
+                                    />
+                                    <TriangleMeshComponent
+                                        setTrianglesBroken={setTrianglesBroken}
+                                        trianglesBroken={trianglesBroken}
+                                        position={new THREE.Vector3(0, i + i, 12)}
+                                    />
+                                </React.Suspense>
+                            );
+                        })}
             </Canvas>
         </main>
     );

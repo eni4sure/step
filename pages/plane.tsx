@@ -4,9 +4,10 @@ import { OrbitControls, Stars, Edges } from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame, useLoader } from "@react-three/fiber";
 
 import type { NextPage } from "next";
+import { Vector3 } from "three";
 
 type SurfacePropType = {
-    position: number[];
+    position: Vector3;
 
     rotateX?: number;
     rotateY?: number;
@@ -16,15 +17,17 @@ type SurfacePropType = {
 };
 
 export const Surface = (props: SurfacePropType) => {
-    const ref = React.useRef<THREE.Mesh>(null!);
+    const meshRef = React.useRef<THREE.Mesh>(null!);
     const texture = useLoader(THREE.TextureLoader, "/dice1.jpeg");
+
+    const { rotateX, rotateY, rotateZ, opacity, ...remaining_prop } = props;
 
     const [hovered, setHover] = React.useState<boolean>(false);
 
     useFrame((state) => {
-        if (props.rotateX) ref.current.rotation.x = props.rotateX;
-        if (props.rotateY) ref.current.rotation.y = props.rotateY;
-        if (props.rotateZ) ref.current.rotation.z = props.rotateZ;
+        if (props.rotateX) meshRef.current.rotation.x = props.rotateX;
+        if (props.rotateY) meshRef.current.rotation.y = props.rotateY;
+        if (props.rotateZ) meshRef.current.rotation.z = props.rotateZ;
         // ref.current.rotation.x += 0.01;
         // ref.current.rotation.y += 0.01;
     });
@@ -35,8 +38,8 @@ export const Surface = (props: SurfacePropType) => {
 
     return (
         <mesh
-            {...props}
-            ref={ref}
+            {...remaining_prop}
+            ref={meshRef}
             onClick={(event) => handleClick(event)}
             onPointerOver={(event) => setHover(true)}
             onPointerOut={(event) => setHover(false)}
@@ -65,24 +68,24 @@ const Home: NextPage = () => {
                 <Stars />
                 <OrbitControls />
                 <ambientLight intensity={3} />
-                <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-                <pointLight position={[-10, -10, -10]} />
+                <spotLight position={new THREE.Vector3(10, 10, 10)} angle={0.15} penumbra={1} />
+                <pointLight position={new THREE.Vector3(-10, -10, -10)} />
 
                 <React.Suspense fallback={null}>
-                    <Surface position={[0, 0, 0]} />
-                    <Surface position={[0, 0, 1]} />
+                    <Surface position={new THREE.Vector3(0, 0, 0)} />
+                    <Surface position={new THREE.Vector3(0, 0, 1)} />
 
-                    <Surface position={[0, 1, 0.5]} rotateX={Math.PI / 2} />
-                    <Surface position={[0, -1, 0.5]} rotateX={Math.PI / 2} />
+                    <Surface position={new THREE.Vector3(0, 1, 0.5)} rotateX={Math.PI / 2} />
+                    <Surface position={new THREE.Vector3(0, -1, 0.5)} rotateX={Math.PI / 2} />
 
-                    <Surface position={[1, 0, 0.5]} rotateY={Math.PI / 2} />
-                    <Surface position={[-1, 0, 0.5]} rotateY={Math.PI / 2} />
+                    <Surface position={new THREE.Vector3(1, 0, 0.5)} rotateY={Math.PI / 2} />
+                    <Surface position={new THREE.Vector3(-1, 0, 0.5)} rotateY={Math.PI / 2} />
 
-                    <Surface position={[-0.8, 0.8, 0.5]} rotateX={Math.PI / 2} rotateY={Math.PI / 4} />
-                    <Surface position={[0.8, -0.8, 0.5]} rotateX={Math.PI / 2} rotateY={Math.PI / 4} />
+                    <Surface position={new THREE.Vector3(-0.8, 0.8, 0.5)} rotateX={Math.PI / 2} rotateY={Math.PI / 4} />
+                    <Surface position={new THREE.Vector3(0.8, -0.8, 0.5)} rotateX={Math.PI / 2} rotateY={Math.PI / 4} />
 
-                    <Surface position={[0.8, 0.8, 0.5]} rotateX={Math.PI / 2} rotateY={-Math.PI / 4} />
-                    <Surface position={[-0.8, -0.8, 0.5]} rotateX={Math.PI / 2} rotateY={-Math.PI / 4} />
+                    <Surface position={new THREE.Vector3(0.8, 0.8, 0.5)} rotateX={Math.PI / 2} rotateY={-Math.PI / 4} />
+                    <Surface position={new THREE.Vector3(-0.8, -0.8, 0.5)} rotateX={Math.PI / 2} rotateY={-Math.PI / 4} />
                 </React.Suspense>
             </Canvas>
         </main>
